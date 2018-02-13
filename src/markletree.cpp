@@ -27,33 +27,24 @@ bool MarkleTree::insert( const char * data , int len )
     {
         MarkleTreeNode * parent = this->leaves.back()->getParent();
         newnode->setData( data );
-        newnode->setParent( parent );
         parent->setRight( newnode );
     }
     else if( this->leaves.size() < (int)pow( 2, this->height ) )
     {
         MarkleTreeNode * parent = this->leaves.back()->getParent()->getParent()->getRight();
         newnode->setData( data );
-        newnode->setParent( parent );
         parent->setRight( newnode );
     }
     else
     {
         MarkleTreeNode * parent = new MarkleTreeNode();
-        parent->setParent( this->leaves.front()->getParent() );
-
         MarkleTreeNode * left = new MarkleTreeNode();
         left->setData( this->leaves.front()->getData() );
-        left->setParent( parent );
-
         newnode->setData( data );
-        newnode->setParent( parent );
-
         parent->setChilden( left, newnode );
 
         this->leaves.pop_front();
         this->leaves.push_back( left );
-        ++this->height;
     }
 
     this->leaves.push_back( newnode );
@@ -111,6 +102,12 @@ MarkleTreeNode * MarkleTree::search( string hash )
 
 bool MarkleTree::build( const char * data , int len )
 {
+    bool isThereRemainder = len % MAX_LEAF_SIZE != 0;
+    int numChildren = len/MAX_LEAF_SIZE;
+    if( isThereRemainder )
+        numChildren += 1;
+    this->height = (unsigned)ceil( log2( numChildren ) );
+
     stringstream ss;
     for( int i = 0, count = 0; i < len; ++i, ++count )
     {
@@ -125,14 +122,14 @@ bool MarkleTree::build( const char * data , int len )
         ss << &data[i];
     }
 
-    if( len % MAX_LEAF_SIZE != 0 )
+    if( isThereRemainder )
     {
         MarkleTreeNode * leaf = new MarkleTreeNode();
         leaf->setData( ss.str() );
         this->leaves.push_back( leaf );
+        numChildren +=1;
     }
 
-    ++this->height;
     return populate( this->leaves ).empty();
 }
 
@@ -171,7 +168,6 @@ deque<MarkleTreeNode *> MarkleTree::populate( deque<MarkleTreeNode *> data )
         aux.push_back( parent );
     }
 
-    ++this->height;
     return populate( aux );
 }
 
@@ -371,5 +367,85 @@ deque<MarkleTreeNode*> MarkleTree::getLeavesFromNodes( deque<MarkleTreeNode *> n
     }
 
     return getLeavesFromNodes( aux );
+}
+
+bool MarkleTree::appendTree( MarkleTree * tree )
+{
+    MarkleTreeNode * newRoot = new MarkleTreeNode();
+    if( newRoot->setChilden( getRoot(), tree->getRoot() ) )
+    {
+        if( this->getRoot()->getRight()->getHash() != tree->getRoot()->getHash() )
+            return false;
+
+        unsigned hdiff = tree->getHeight() - this->getHeight();
+
+        this->root = newRoot;
+
+        if( hdiff > 0 )
+            this->height += hdiff + 1;
+        else
+            this->height += 1;
+
+        deque<MarkleTreeNode*> newleaves;
+        newleaves.push_back( this->getRoot()->getRight() );
+        newleaves = getLeavesFromNodes( newleaves );
+
+        for ( deque<MarkleTreeNode*>::iterator it = newleaves.begin() ; it != newleaves.end(); ++it )
+        {
+            this->leaves.push_back( (*it) );
+        }
+
+        return true;
+    }
+    return false;
+}
+
+vector<string> MarkleTree::auditProof( string hash )
+{
+    vector<string> data;
+    for ( deque<MarkleTreeNode*>::iterator it = this->leaves.begin() ; it != this->leaves.end(); ++it )
+    {
+        if( (*it)->getHash() == hash )
+        {
+            MarkleTreeNode * node = (*it);
+            while( !node->isRoot() )
+            {
+                if( node->getParent()->getLeft() )
+                {
+                    if( node->getParent()->getLeft()->getHash() != node->getHash() )
+                    {
+                        data.push_back( node->getParent()->getLeft()->getHash() );
+                    }
+                    else
+                    {
+                        if( node->getParent()->getRight() )
+                            data.push_back( node->getParent()->getRight()->getHash() );
+                        else
+                            data.push_back( node->getParent()->getLeft()->getHash() );
+                    }
+                }
+
+                if( node->getParent()->getRight() )
+                {
+                    if( node->getParent()->getRight()->getHash() != node->getHash() )
+                    {
+                        data.push_back( node->getParent()->getRight()->getHash() );
+                    }
+                    else
+                    {
+                        if( node->getParent()->getLeft() )
+                            data.push_back( node->getParent()->getLeft()->getHash() );
+                        else
+                            data.push_back( node->getParent()->getRight()->getHash() );
+                    }
+                }
+                node = node->getParent();
+            }
+
+            break;
+        }
+    }
+
+    return data;
 }
 

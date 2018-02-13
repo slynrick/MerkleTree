@@ -8,13 +8,13 @@ class MarkleTree
 {
     MarkleTreeNode * root;
     deque<MarkleTreeNode*> leaves;
-    int height;
+    unsigned height;
     public:
         MarkleTree();
         ~MarkleTree();
 
         MarkleTreeNode * getRoot(){ return this->root; }
-        int getHeight(){ return this->height; }
+        unsigned getHeight(){ return this->height; }
 
         bool insert( const char * data , int len ); //TODO: verificar melhor forma de inclusão
         bool remove( string hash );
@@ -22,6 +22,9 @@ class MarkleTree
         bool build( const char * data, int len );
         bool isValid();
         bool syncronize( MarkleTree * tree );
+        bool appendTree( MarkleTree * tree );
+
+        vector<string> auditProof( string hash );
 
     private:
         deque<MarkleTreeNode*> populate( deque<MarkleTreeNode*> data );

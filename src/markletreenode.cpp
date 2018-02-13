@@ -34,6 +34,7 @@ bool MarkleTreeNode::setLeft( MarkleTreeNode * left )
     if( !left )
         return false;
     this->left = left;
+    this->getLeft()->setParent( this );
     return setHash();
 }
 
@@ -42,6 +43,7 @@ bool MarkleTreeNode::setRight( MarkleTreeNode * right )
     if( !right )
         return false;
     this->right = right;
+    this->getRight()->setParent( this );
     return setHash();
 }
 
@@ -49,6 +51,10 @@ bool MarkleTreeNode::setChilden( MarkleTreeNode * left, MarkleTreeNode * right )
 {
     if( setLeft( left ) )
         if( setRight( right ) )
+        {
+            left->setParent( this );
+            right->setParent( this );
+        }
             return setHash();
     return false;
 }

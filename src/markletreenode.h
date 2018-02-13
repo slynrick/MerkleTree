@@ -11,7 +11,7 @@ class MarkleTreeNode
     MarkleTreeNode * right;
     MarkleTreeNode * parent;
     string hash;
-    string data;// hash quando não for uma folha. o que define uma folha é não ter filhos
+    string data;
 
     public:
         MarkleTreeNode();
@@ -19,6 +19,8 @@ class MarkleTreeNode
 
         bool isLeaf(){ return ( !getLeft() && !getRight() ); }
         bool isRoot(){ return !getParent(); }
+
+        unsigned getHeight(){ return getParent() ? getParent()->getHeight() - 1 : 0; }
 
         bool setData( string data );
         string getData(){ return this->data; }
