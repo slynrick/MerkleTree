@@ -20,6 +20,8 @@ class MerkleTreeNode
         bool isLeaf(){ return ( !getLeft() && !getRight() ); }
         bool isRoot(){ return !getParent(); }
 
+        int getNumChidren(){ if( isLeaf() ) return 0; else if( getLeft() && getRight() ) return 2; else return 1; }
+
         unsigned getHeight(){ return getParent() ? getParent()->getHeight() + 1 : 0; }
 
         bool setData( string data );
