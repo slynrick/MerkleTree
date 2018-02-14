@@ -68,7 +68,7 @@ bool MerkleTree::insert( const char * data , int len )
     MerkleTreeNode * currnode = newnode->getParent();
     while( currnode != NULL )
     {
-        if( !currnode->setHash() )
+        if( currnode->setHash( currnode->calculateHash() ) )
             return false;
         currnode = currnode->getParent();
     }
@@ -92,7 +92,7 @@ bool MerkleTree::remove( string hash )
             MerkleTreeNode * currnode = node->getParent();
             while( currnode != NULL )
             {
-                if( !currnode->setHash() )
+                if( currnode->setHash( currnode->calculateHash() ) )
                     return false;
                 currnode = currnode->getParent();
             }
@@ -196,7 +196,7 @@ bool MerkleTree::isValid()
     {
         if( this->nodes[i] )
         {
-            if( !this->nodes[i]->isValid() )
+            if( this->nodes[i]->calculateHash() == this->nodes[i]->getHash() )
                 valid = false;
         }
     }

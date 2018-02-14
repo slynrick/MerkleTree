@@ -24,7 +24,7 @@ bool MerkleTreeNode::setData( string data )
     if( isLeaf() )
     {
         this->data = data;
-        return setHash();
+        return setHash( calculateHash() );
     }
     return false;
 }
@@ -35,7 +35,7 @@ bool MerkleTreeNode::setLeft( MerkleTreeNode * left )
         return false;
     this->left = left;
     this->getLeft()->setParent( this );
-    return setHash();
+    return setHash( calculateHash() );
 }
 
 bool MerkleTreeNode::setRight( MerkleTreeNode * right )
@@ -44,7 +44,7 @@ bool MerkleTreeNode::setRight( MerkleTreeNode * right )
         return false;
     this->right = right;
     this->getRight()->setParent( this );
-    return setHash();
+    return setHash( calculateHash() );
 }
 
 bool MerkleTreeNode::setChilden( MerkleTreeNode * left, MerkleTreeNode * right )
@@ -55,7 +55,7 @@ bool MerkleTreeNode::setChilden( MerkleTreeNode * left, MerkleTreeNode * right )
             left->setParent( this );
             right->setParent( this );
         }
-            return setHash();
+            return setHash( calculateHash() );
     return false;
 }
 
@@ -93,16 +93,6 @@ string MerkleTreeNode::calculateHash()
     }
 
     return tohash;
-}
-
-bool MerkleTreeNode::setHash()
-{
-    string h = calculateHash();
-    if( h == string() )
-        return false;
-
-    this->hash = h;
-    return true;
 }
 
 bool MerkleTreeNode::isValid()

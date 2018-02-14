@@ -25,8 +25,8 @@ class MerkleTreeNode
         bool setData( string data );
         string getData(){ return this->data; }
 
-        bool setHash();
-        void setHash( string hash ){ this->hash = hash; }
+        bool setHash( string hash ){ if( hash.empty() ) return false; this->hash = hash; return true; }
+        string calculateHash();
         string getHash(){ return this->hash; }
 
         bool setChilden( MerkleTreeNode * left, MerkleTreeNode * right );
@@ -41,5 +41,4 @@ class MerkleTreeNode
         MerkleTreeNode * getParent(){ return this->parent; }
 
         bool isValid();
-        string calculateHash();
 };
