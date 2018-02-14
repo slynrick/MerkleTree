@@ -107,7 +107,15 @@ bool MerkleTreeNode::setHash()
 
 bool MerkleTreeNode::isValid()
 {
-    if( calculateHash() != this->hash )
+    MerkleTreeNode * node = this;
+    while( node )
+    {
+        if( node->calculateHash() != node->getHash() )
+            break;
+        node = node->getParent();
+    }
+
+    if( !node->isRoot() )
         return false;
     return true;
 }
