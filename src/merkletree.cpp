@@ -3,8 +3,6 @@
 #include <sstream>
 #include <vector>
 
-#define MAX_LEAF_SIZE 256 //256 bytes
-
 MerkleTree::MerkleTree()
 {
     this->height = 0;
@@ -18,7 +16,7 @@ MerkleTree::~MerkleTree()
 
 bool MerkleTree::insert( const char * data , int len )
 {
-    if(len > MAX_LEAF_SIZE )
+    if( len <= 0 )
         return false;
 
     MerkleTreeNode * newnode = new MerkleTreeNode();
@@ -121,15 +119,12 @@ MerkleTreeNode * MerkleTree::search( string hash )
     return NULL;
 }
 
-bool MerkleTree::build( const char * data , int len )
+bool MerkleTree::build( vector<string> data )
 {
-    if( len == 0 )
+    if( data.size() == 0 )
         return false;
 
-    bool isThereRemainder = len % MAX_LEAF_SIZE != 0;
-    unsigned numChildren = len/MAX_LEAF_SIZE;
-    if( isThereRemainder )
-        numChildren += 1;
+    unsigned numChildren = data.size();
     this->height = (unsigned)ceil( log2( numChildren ) );
     unsigned numElements = (unsigned)ceil( pow( 2, this->height + 1 ) - 1 );
 
@@ -137,26 +132,12 @@ bool MerkleTree::build( const char * data , int len )
 
     unsigned maxNumLeaves = (unsigned)pow( 2, height );
 
-    stringstream ss;
-    for( int i = 0, count = 0; i < len; ++i, ++count )
-    {
-        if( count == MAX_LEAF_SIZE )
-        {
-            MerkleTreeNode * leaf = new MerkleTreeNode();
-            leaf->setData( ss.str() );
-            this->nodes[ numElements - maxNumLeaves ] = leaf;
-            --maxNumLeaves;
-            count = 0;
-            ss.str("");
-        }
-        ss << &data[i];
-    }
-
-    if( isThereRemainder )
+    for( int i = 0; i < data.size(); ++i )
     {
         MerkleTreeNode * leaf = new MerkleTreeNode();
-        leaf->setData( ss.str() );
+        leaf->setData( data[i] );
         this->nodes[ numElements - maxNumLeaves ] = leaf;
+        --maxNumLeaves;
     }
 
     if( numChildren == 1 )
@@ -266,15 +247,12 @@ vector<string> MerkleTree::auditProof( string hash )
 {
     vector<string> data;
 
-    for ( unsigned i = this->nodes.size() - 1; i >= 0; --i )
-    {
-        if( this->nodes[i]->getHeight() < this->getHeight() - 1 )
-            break;
+    MerkleTreeNode * node = search( hash );
 
-        if( this->nodes[i]->isLeaf() )
-            if( this->nodes[i]->getHash() == hash )
+    if( node )
+        if( node->isLeaf() )
+            if( node->getHash() == hash )
             {
-                MerkleTreeNode * node = this->nodes[i];
                 while( !node->isRoot() )
                 {
                     if( node->getParent()->getLeft() )
@@ -308,10 +286,7 @@ vector<string> MerkleTree::auditProof( string hash )
                     }
                     node = node->getParent();
                 }
-
-                break;
             }
-    }
 
     return data;
 }
