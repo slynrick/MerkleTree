@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(markletree)
+project(merkletree)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
@@ -8,8 +8,8 @@ set(SRC "src")
 
 set( project_sources
    main.cpp
-   src/markletree.cpp
-   src/markletreenode.cpp
+   src/merkletree.cpp
+   src/merkletreenode.cpp
    src/hash.cpp
 )
 

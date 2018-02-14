@@ -6,23 +6,23 @@
 #include <vector>
 #include <random>
 
-#include "src/markletree.h"
+#include "src/merkletree.h"
 
 using namespace std;
 using namespace std::chrono;
 
-vector<MarkleTree*> timeCreatingMarkleTree()
+vector<MerkleTree*> timeCreatingMerkleTree()
 {
-    cout << "Contabilizando tempo para criação de uma MarkleTree" << endl;
+    cout << "Contabilizando tempo para criação de uma MerkleTree" << endl;
     srand (time(NULL));
-    vector<MarkleTree*> trees;
+    vector<MerkleTree*> trees;
     stringstream ss;
     for( int i = 0; i < 5000; ++i )
     {
         if( i % 100 == 0 )
         {
             high_resolution_clock::time_point t1 = high_resolution_clock::now();
-            MarkleTree * tree = new MarkleTree();
+            MerkleTree * tree = new MerkleTree();
             tree->build( ss.str().c_str(), i );
             high_resolution_clock::time_point t2 = high_resolution_clock::now();
             duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
@@ -34,9 +34,9 @@ vector<MarkleTree*> timeCreatingMarkleTree()
     return trees;
 }
 
-void timeValidatingMarkleTree( vector<MarkleTree*> trees )
+void timeValidatingMerkleTree( vector<MerkleTree*> trees )
 {
-    cout << "Contabilizando tempo para validação de arvores MarkleTree criadas acima" << endl;
+    cout << "Contabilizando tempo para validação de arvores MerkleTree criadas acima" << endl;
     for( int i = 0; i < trees.size(); ++i )
     {
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
@@ -47,9 +47,9 @@ void timeValidatingMarkleTree( vector<MarkleTree*> trees )
     }
 }
 
-void timeComparingMarkleTree( vector<MarkleTree*> trees )
+void timeComparingMerkleTree( vector<MerkleTree*> trees )
 {
-    cout << "Contabilizando tempo para sincronização entre MarkleTrees criadas acima com a última criada" << endl;
+    cout << "Contabilizando tempo para sincronização entre MerkleTrees criadas acima com a última criada" << endl;
     // utilizarei a maior arvore para comparar com todas
     for( int i = 0; i < trees.size(); ++i )
     {
@@ -64,9 +64,9 @@ void timeComparingMarkleTree( vector<MarkleTree*> trees )
 int main( int argv, char** argc )
 {
     cout << "Iniciando testes" << endl << endl;
-    vector<MarkleTree*> trees = timeCreatingMarkleTree();
-    timeValidatingMarkleTree( trees );
-    timeComparingMarkleTree( trees );
+    vector<MerkleTree*> trees = timeCreatingMerkleTree();
+    timeValidatingMerkleTree( trees );
+    timeComparingMerkleTree( trees );
     cout << "Fim dos testes" << endl << endl;
     return 0;
 }

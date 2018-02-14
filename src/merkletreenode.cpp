@@ -1,6 +1,6 @@
-#include "markletreenode.h"
+#include "merkletreenode.h"
 
-MarkleTreeNode::MarkleTreeNode()
+MerkleTreeNode::MerkleTreeNode()
 {
     this->left = NULL;
     this->right = NULL;
@@ -8,7 +8,7 @@ MarkleTreeNode::MarkleTreeNode()
     this->data = string();
 }
 
-MarkleTreeNode::~MarkleTreeNode()
+MerkleTreeNode::~MerkleTreeNode()
 {
     if( this->getLeft() )
         delete this->left;
@@ -19,7 +19,7 @@ MarkleTreeNode::~MarkleTreeNode()
 }
 
 
-bool MarkleTreeNode::setData( string data )
+bool MerkleTreeNode::setData( string data )
 {
     if( isLeaf() )
     {
@@ -29,7 +29,7 @@ bool MarkleTreeNode::setData( string data )
     return false;
 }
 
-bool MarkleTreeNode::setLeft( MarkleTreeNode * left )
+bool MerkleTreeNode::setLeft( MerkleTreeNode * left )
 {
     if( !left )
         return false;
@@ -38,7 +38,7 @@ bool MarkleTreeNode::setLeft( MarkleTreeNode * left )
     return setHash();
 }
 
-bool MarkleTreeNode::setRight( MarkleTreeNode * right )
+bool MerkleTreeNode::setRight( MerkleTreeNode * right )
 {
     if( !right )
         return false;
@@ -47,7 +47,7 @@ bool MarkleTreeNode::setRight( MarkleTreeNode * right )
     return setHash();
 }
 
-bool MarkleTreeNode::setChilden( MarkleTreeNode * left, MarkleTreeNode * right )
+bool MerkleTreeNode::setChilden( MerkleTreeNode * left, MerkleTreeNode * right )
 {
     if( setLeft( left ) )
         if( setRight( right ) )
@@ -59,12 +59,12 @@ bool MarkleTreeNode::setChilden( MarkleTreeNode * left, MarkleTreeNode * right )
     return false;
 }
 
-void MarkleTreeNode::setParent( MarkleTreeNode * parent )
+void MerkleTreeNode::setParent( MerkleTreeNode * parent )
 {
     this->parent = parent;
 }
 
-string MarkleTreeNode::calculateHash()
+string MerkleTreeNode::calculateHash()
 {
 
     if( isLeaf() )
@@ -95,7 +95,7 @@ string MarkleTreeNode::calculateHash()
     return tohash;
 }
 
-bool MarkleTreeNode::setHash()
+bool MerkleTreeNode::setHash()
 {
     string h = calculateHash();
     if( h == string() )
@@ -105,7 +105,7 @@ bool MarkleTreeNode::setHash()
     return true;
 }
 
-bool MarkleTreeNode::isValid()
+bool MerkleTreeNode::isValid()
 {
     if( calculateHash() != this->hash )
         return false;
