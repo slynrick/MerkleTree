@@ -1,7 +1,7 @@
 #include "merkletree.h"
 
 #include <sstream>
-#include <vector>
+#include <queue>
 
 MerkleTree::MerkleTree()
 {
@@ -197,19 +197,26 @@ bool MerkleTree::syncronize( MerkleTree * tree )
     if( getRoot()->getHash() == tree->getRoot()->getHash() )
         return true;
 
-    this->height = tree->getHeight();
-
-    int numElements = (int)ceil( pow( 2, this->height + 1 ) - 1 );
-
-    this->nodes.resize( numElements );
-
-    for ( int i = this->nodes.size() - 1; i >= 0; --i )
+    if( this->getHeight() != tree->getHeight() )
     {
-        if( !this->nodes[i] && !tree->getNodes()[i] )
+        this->height = tree->getHeight();
+        int numElements = getMaxNumElements( this->height );
+        this->nodes.resize( numElements );
+    }
+
+    queue<int> toSync;
+    toSync.push( 0 );
+
+    while( !toSync.empty() )
+    {
+        int i = toSync.front(); toSync.pop();
+        if( i >= this->nodes.size() )
             continue;
-        else if( this->nodes[i] && !tree->getNodes()[i] )
+        else if( !this->nodes[i] && !(*tree->getNodes())[i] )
+            continue;
+        else if( this->nodes[i] && !(*tree->getNodes())[i] )
             delete this->nodes[i];
-        else if( !this->nodes[i] && tree->getNodes()[i] )
+        else if( !this->nodes[i] && (*tree->getNodes())[i] )
         {
             int r =  ( i - 1 ) % 2;
             int parentIdx = getParentIdx( i );
@@ -233,17 +240,17 @@ bool MerkleTree::syncronize( MerkleTree * tree )
         }
         else
         {
-            if ( this->nodes[i]->getHash() != tree->getNodes()[i]->getHash() )
+            if ( this->nodes[i]->getHash() != (*tree->getNodes())[i]->getHash() )
             {
-                this->nodes[i]->setHash( tree->getNodes()[i]->getHash() );
-                if( !tree->getNodes()[i]->getData().empty() )
-                    this->nodes[i]->setData( tree->getNodes()[i]->getData() );
+                this->nodes[i]->setHash( (*tree->getNodes())[i]->getHash() );
+                if( !(*tree->getNodes())[i]->getData().empty() )
+                    this->nodes[i]->setData( (*tree->getNodes())[i]->getData() );
+
+                toSync.push( getChildIdx( i, true ) );
+                toSync.push( getChildIdx( i, false ) );
             }
         }
-
-
     }
-
     return true;
 }
 
