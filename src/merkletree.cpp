@@ -218,24 +218,23 @@ bool MerkleTree::syncronize( MerkleTree * tree )
             delete this->nodes[i];
         else if( !this->nodes[i] && (*tree->getNodes())[i] )
         {
-            int r =  ( i - 1 ) % 2;
             int parentIdx = getParentIdx( i );
             if( !this->nodes[parentIdx] )
             {
                 MerkleTreeNode * parent = new MerkleTreeNode();
-                if( r > 0 )
-                    parent->setRight( this->nodes[i] );
-                else
+                if( isLeftChild( i ) )
                     parent->setLeft( this->nodes[i] );
+                else
+                    parent->setRight( this->nodes[i] );
 
                 this->nodes[parentIdx] = parent;
             }
             else
             {
-                if( r > 0 )
-                    this->nodes[parentIdx]->setRight( this->nodes[i] );
-                else
+                if( isLeftChild( i ) )
                     this->nodes[parentIdx]->setLeft( this->nodes[i] );
+                else
+                    this->nodes[parentIdx]->setRight( this->nodes[i] );
             }
         }
         else
