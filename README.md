@@ -17,19 +17,25 @@ A árvore guarda seus nós em um vector<MerkleTreeNode*> ordenada por níveis. S
 Quando a árvore não possui todos as folhas em utilização fica com muitos nós vazios ocupados. Como o número de folhas é base dois, dependendo do número de dados que queremos inserir na árvore, teremos ocupado um maior espaço do que necessário.
 A árvore possui funçes de validação e sincronização, garantindo um grande possibilidade de aplicação.
 
+Acredito que a única forma que conseguir log(N) para inserção, remoção e procura seja com uma AVL, porém ainda não encontrei uma maneira de implementar a MerkleTree como AVL.
+
 ### Nós
 Os nós possuem informação de dados e hash, sendo que o primeiro só é preenchido quando o nó é uma folha.
 Os nós possuem ponteiro para seus pais e filhos, tornando assim uma fácil manipulação quando não tiver acesso ao vetor de nós.
 Os nós também conseguem se validar, verificando todos os hashs a partir deles até a raiz.
 
-### Metas
-- [ ] O( Log2(N) ) na inserção `Até o momento em O( N*Log2(N) ) e Ω( Log2(N) )`
-- [ ] Θ( Log2(N) ) na remoção `Até o momento em O( N*Log2(N) ) e Ω( Log2(N) )`
-- [ ] Θ( Log2(N) ) na procura `Até o momento em O( N*Log2(N) ) e Ω( Log2(N) )`
-- [ ] O( N ) e Ω( Log2(N) ) na sincronização de árvores `Até o momento em Θ( N )`
-- [x] Θ( N ) na criação da árvore
-- [x] Θ( N ) na validação da árvore
-- [x] Θ( N ) em espaço
+### Situação
+
+Casos | Melhor caso ideal | Pior caso ideal | Melhor caso real | Pior caso real |
+--- | --- | --- | --- |--- |
+*Inserção* | Log2(N) | Log2(N) | Log2(N) | N + Log2(N) |
+*Remoção* | Log2(N) | Log2(N) | Log2(N) | N + Log2(N) |
+*Procura* | Log2(N) | Log2(N) | 1 | N |
+**Syncronização** | Log2(N) | N | Log2(N) | N |
+**Criação da árvore** | N | N | N | N |
+**Validação da árvore** | N | N | N | N |
+**Validação do nó** | Log2(N) | Log2(N) | Log2(N) | Log2(N) |
+**Espaço** | N | N | N | N |
 
 ### Licença
  MIT License 
