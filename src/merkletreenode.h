@@ -22,7 +22,7 @@ class MerkleTreeNode
 
         int getNumChidren(){ if( isLeaf() ) return 0; else if( getLeft() && getRight() ) return 2; else return 1; }
 
-        unsigned getHeight(){ return getParent() ? getParent()->getHeight() + 1 : 0; }
+        unsigned getHeight();
 
         bool setData( string data );
         string getData(){ return this->data; }

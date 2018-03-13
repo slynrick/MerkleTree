@@ -98,14 +98,31 @@ string MerkleTreeNode::calculateHash()
 bool MerkleTreeNode::isValid()
 {
     MerkleTreeNode * node = this;
-    while( node )
-    {
-        if( node->calculateHash() != node->getHash() )
-            break;
-        node = node->getParent();
-    }
 
-    if( !node->isRoot() )
+    if( node->calculateHash() != node->getHash() )
         return false;
-    return true;
+
+
+    bool validl = node->getLeft() ? node->getLeft()->isValid() : true;
+    bool validr = node->getRight() ? node->getRight()->isValid() : true;
+
+    return ( validl && validr );
+}
+
+unsigned MerkleTreeNode::getHeight()
+{
+    if( isLeaf() )
+        return 0;
+
+    unsigned l = 0, r = 0;
+    if( getLeft() )
+        l = getLeft()->getHeight();
+    if( getRight() )
+        r = getRight()->getHeight();
+
+    unsigned h =  l >= r ? l : r;
+    ++h;
+
+    return h;
+
 }

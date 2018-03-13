@@ -5,13 +5,14 @@
 
 MerkleTree::MerkleTree()
 {
-    this->height = 0;
+    this->root = new MerkleTreeNode();
 }
 
 MerkleTree::~MerkleTree()
 {
-    this->nodes.clear();
-    this->nodes.shrink_to_fit();
+    delete root;
+    this->leaves.clear();
+    this->leaves.shrink_to_fit();
 }
 
 bool MerkleTree::insert( string data )
@@ -22,72 +23,45 @@ bool MerkleTree::insert( string data )
     MerkleTreeNode * newnode = new MerkleTreeNode();
     newnode->setData( data );
 
-    for( int i = getFirstElementInHeight( this->height ); i < this->nodes.size(); ++i )
+    MerkleTreeNode * node = this->root;
+
+    while( node )
     {
-        if( !this->nodes[i] )
+        if( node->isLeaf() )
         {
-            this->nodes[i] = newnode;
-            int parentIdx = getParentIdx( i );
-            MerkleTreeNode * parent = this->nodes[parentIdx];
-            if( !parent )
-            {
-                parent = new MerkleTreeNode();
-                parent->setLeft( this->nodes[i] );
-
-                int idxc = i;
-                int idxp = getParentIdx( parentIdx );
-                while( idxp > 0 )
-                {
-                    if( !this->nodes[idxp] )
-                    {
-                        this->nodes[idxp] = new MerkleTreeNode();
-                        this->nodes[idxp]->setLeft( this->nodes[idxc] );
-                    }
-                    idxc = idxp;
-                    idxp = getParentIdx( idxp );
-                }
-            }
-            else
-            {
-                if( parent->getLeft() )
-                    parent->setRight( this->nodes[i] );
-                else
-                    parent->setLeft( this->nodes[i] );
-            }
-
+            MerkleTreeNode * leaf = new MerkleTreeNode();
+            leaf->setData( node->getData() );
+            node->setLeft( leaf );
+            node->setRight( newnode );
         }
+
+        if( !node->getLeft() )
+        {
+            node->setLeft( newnode );
+            break;
+        }
+        else if( !node->getRight() )
+        {
+            node->setRight( newnode );
+            break;
+        }
+
+        int balance = node->getLeft()->getHeight() - node->getRight()->getHeight();
+        if( balance >= 0 )
+            node = node->getLeft();
+        else
+            node = node->getRight();
+
     }
 
-    if( !newnode->getParent() )
+    node = node->getParent();
+
+    while( node )
     {
-        ++this->height;
-        unsigned numElements = getMaxNumElements( this->height );
-        this->nodes.resize( numElements );
-        unsigned maxNumLeaves = getMaxNumLeaves( this->height );
-
-
-        int parentIdx = getParentIdx( numElements - maxNumLeaves );
-        MerkleTreeNode * parent = this->nodes[parentIdx];
-        MerkleTreeNode * left = new MerkleTreeNode();
-        left->setData( parent->getData() );
-
-        this->nodes[ numElements - maxNumLeaves ] = newnode;
-        --maxNumLeaves;
-        this->nodes[ numElements - maxNumLeaves ] = left;
-
-        parent->setRight( newnode );
-        parent->setLeft( left );
-        newnode->setParent( parent );
-        left->setParent( parent );
+        node->setHash( node->calculateHash() );
+        node = node->getParent();
     }
 
-    MerkleTreeNode * currnode = newnode->getParent();
-    while( currnode != NULL )
-    {
-        if( currnode->setHash( currnode->calculateHash() ) )
-            return false;
-        currnode = currnode->getParent();
-    }
 
     return true;
 }
@@ -96,16 +70,16 @@ bool MerkleTree::remove( string hash )
 {
 
     int idx = search( hash );
-    if( idx >= 0 && this->nodes[idx] )
+    if( idx >= 0 && this->leaves[idx] )
     {
-        int parentIdx = getParentIdx( idx );
-        while( parentIdx >= 0 && this->nodes[parentIdx]->getNumChidren() <= 1 )
+        MerkleTreeNode * parent = this->leaves[idx]->getParent();
+        while( parent->getNumChidren() < 2 )
         {
-            delete this->nodes[idx];
-
-            idx = parentIdx;
-            parentIdx = getParentIdx( idx );
+            parent = parent->getParent();
         }
+        delete parent;
+        this->leaves.erase( this->leaves.begin() + idx );
+        this->leaves.shrink_to_fit();
         return true;
     }
     return false;
@@ -113,11 +87,11 @@ bool MerkleTree::remove( string hash )
 
 int MerkleTree::search( string hash )
 {
-    for( int i = getFirstElementInHeight( this->height - 1 ); i < this->nodes.size(); ++i )
+    for( int i = 0; i < this->leaves.size(); ++i )
     {
-        if( this->nodes[i] && this->nodes[i]->isLeaf() )
+        if( this->leaves[i] && this->leaves[i]->isLeaf() )
         {
-            if( this->nodes[i]->getHash() == hash )
+            if( this->leaves[i]->getHash() == hash )
             {
                 return i;
             }
@@ -131,42 +105,9 @@ bool MerkleTree::build( vector<string> data )
     if( data.size() == 0 )
         return false;
 
-    unsigned numChildren = data.size();
-    this->height = (unsigned)ceil( log2( numChildren ) );
-    unsigned numElements = (unsigned)ceil( pow( 2, this->height + 1 ) - 1 );
-
-    this->nodes.resize( numElements );
-
-    unsigned maxNumLeaves = (unsigned)pow( 2, height );
-
     for( int i = 0; i < data.size(); ++i )
-    {
-        MerkleTreeNode * leaf = new MerkleTreeNode();
-        leaf->setData( data[i] );
-        this->nodes[ numElements - maxNumLeaves ] = leaf;
-        --maxNumLeaves;
-    }
-
-    for ( int i = this->nodes.size() - 1; i >= 0; --i )
-    {
-        int parentIdx = getParentIdx( i );
-        if( parentIdx < 0 )
-            break;
-
-        if( this->nodes[i] )
-        {
-            if( !this->nodes[parentIdx] )
-            {
-                this->nodes[parentIdx] = new MerkleTreeNode();
-                this->nodes[parentIdx]->setRight( this->nodes[i] );
-            }
-            else
-            {
-                this->nodes[parentIdx]->setLeft( this->nodes[i] );
-            }
-
-        }
-    }
+        if( !insert( data[i] ) )
+            return false;
 
     return true;
 }
@@ -176,17 +117,7 @@ bool MerkleTree::isValid()
     if( !getRoot() )
         return false;
 
-    bool valid = true; // isso garante contra timming attack
-    for ( int i = this->nodes.size() - 1; i >= 0; --i )
-    {
-        if( this->nodes[i] )
-        {
-            if( this->nodes[i]->calculateHash() == this->nodes[i]->getHash() )
-                valid = false;
-        }
-    }
-
-    return valid;
+    return this->getRoot()->isValid();
 }
 
 bool MerkleTree::syncronize( MerkleTree * tree )
@@ -197,59 +128,6 @@ bool MerkleTree::syncronize( MerkleTree * tree )
     if( getRoot()->getHash() == tree->getRoot()->getHash() )
         return true;
 
-    if( this->getHeight() != tree->getHeight() )
-    {
-        this->height = tree->getHeight();
-        int numElements = getMaxNumElements( this->height );
-        this->nodes.resize( numElements );
-    }
-
-    queue<int> toSync;
-    toSync.push( 0 );
-
-    while( !toSync.empty() )
-    {
-        int i = toSync.front(); toSync.pop();
-        if( i >= this->nodes.size() )
-            continue;
-        else if( !this->nodes[i] && !(*tree->getNodes())[i] )
-            continue;
-        else if( this->nodes[i] && !(*tree->getNodes())[i] )
-            delete this->nodes[i];
-        else if( !this->nodes[i] && (*tree->getNodes())[i] )
-        {
-            int parentIdx = getParentIdx( i );
-            if( !this->nodes[parentIdx] )
-            {
-                MerkleTreeNode * parent = new MerkleTreeNode();
-                if( isLeftChild( i ) )
-                    parent->setLeft( this->nodes[i] );
-                else
-                    parent->setRight( this->nodes[i] );
-
-                this->nodes[parentIdx] = parent;
-            }
-            else
-            {
-                if( isLeftChild( i ) )
-                    this->nodes[parentIdx]->setLeft( this->nodes[i] );
-                else
-                    this->nodes[parentIdx]->setRight( this->nodes[i] );
-            }
-        }
-        else
-        {
-            if ( this->nodes[i]->getHash() != (*tree->getNodes())[i]->getHash() )
-            {
-                this->nodes[i]->setHash( (*tree->getNodes())[i]->getHash() );
-                if( !(*tree->getNodes())[i]->getData().empty() )
-                    this->nodes[i]->setData( (*tree->getNodes())[i]->getData() );
-
-                toSync.push( getChildIdx( i, true ) );
-                toSync.push( getChildIdx( i, false ) );
-            }
-        }
-    }
     return true;
 }
 
@@ -258,7 +136,7 @@ vector<string> MerkleTree::auditProof( string hash )
     vector<string> data;
 
     int idx = search( hash );
-    MerkleTreeNode * node = this->nodes[idx];
+    MerkleTreeNode * node = this->leaves[idx];
 
     if( node )
         if( node->isLeaf() )
