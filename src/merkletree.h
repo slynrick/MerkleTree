@@ -16,11 +16,11 @@ class MerkleTree
         vector<MerkleTreeNode*> * getLeaves(){ return &leaves; }
         unsigned getHeight(){ return this->root->getHeight(); }
 
-        bool insert(string data ); //TODO: verificar melhor forma de inclusão
+        bool insert(string data );
         bool remove( string hash );
         int search( string hash );
         bool build( vector<string> data );
         bool isValid();
-        bool syncronize( MerkleTree * tree );
+        bool syncronize( MerkleTree * newTree );
         vector<string> auditProof( string hash );
 };

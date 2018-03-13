@@ -109,6 +109,11 @@ bool MerkleTreeNode::isValid()
     return ( validl && validr );
 }
 
+bool MerkleTreeNode::sync( MerkleTreeNode * newNode )
+{
+    return true;
+}
+
 unsigned MerkleTreeNode::getHeight()
 {
     if( isLeaf() )

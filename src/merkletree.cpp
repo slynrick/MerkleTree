@@ -128,7 +128,7 @@ bool MerkleTree::syncronize( MerkleTree * tree )
     if( getRoot()->getHash() == tree->getRoot()->getHash() )
         return true;
 
-    return true;
+    return getRoot()->sync( tree->getRoot() );
 }
 
 vector<string> MerkleTree::auditProof( string hash )
