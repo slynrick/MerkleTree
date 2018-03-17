@@ -113,7 +113,7 @@ void searchDataMerkleTree( const vector<MerkleTree*> &trees, string hash )
     for( int i = 0; i < trees.size(); ++i )
     {
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        bool find = trees[i]->search( hash ) != -1;
+        bool find = trees[i]->search( hash ) != NULL;
         high_resolution_clock::time_point t2 = high_resolution_clock::now();
         duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
         cout << "Tree : " << i << " duration: " << fixed << setprecision( PRECISION ) << time_span.count() << "s" << " found? " << find << endl << endl;

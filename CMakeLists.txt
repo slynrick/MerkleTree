@@ -11,6 +11,8 @@ set( project_sources
    src/merkletree.cpp
    src/merkletreenode.cpp
    src/hash.cpp
+   src/customavl.cpp
+   src/customavlnode.cpp
 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
