@@ -13,11 +13,9 @@ Os Hashs são calculados com Double SHA512, que são duas aplicações da funç�
 OBS: Entenda || como concatenação, e lembre-se de que ela é realizada na ordem que foi informada acima.
 
 ### Árvore
-A árvore guarda seus nós em um vector<MerkleTreeNode*> ordenada por níveis. Sempre tentando manter as folhas no mesmo nível, no máximo ficam também no nível acima.
-Quando a árvore não possui todos as folhas em utilização fica com muitos nós vazios ocupados. Como o número de folhas é base dois, dependendo do número de dados que queremos inserir na árvore, teremos ocupado um maior espaço do que necessário.
-A árvore possui funçes de validação e sincronização, garantindo um grande possibilidade de aplicação.
+A árvore guarda suas folhas em uma AVL customizada que se arruma pela comparaçao da string de hash.
 
-Acredito que a única forma que conseguir log(N) para inserção, remoção e procura seja com uma AVL, porém ainda não encontrei uma maneira de implementar a MerkleTree como AVL.
+Não consegui implementar a Merkle tree como AVL, mas consegui usar uma AVL como árvore auxiliar e isso permite que tenhamos Log2(N) em inserção, procura e remoção.
 
 ### Nós
 Os nós possuem informação de dados e hash, sendo que o primeiro só é preenchido quando o nó é uma folha.
@@ -28,9 +26,9 @@ Os nós também conseguem se validar, verificando todos os hashs a partir deles 
 
 Casos | Melhor caso ideal | Pior caso ideal | Melhor caso real | Pior caso real |
 --- | --- | --- | --- |--- |
-*Inserção* | Log2(N) | Log2(N) | Log2(N) | N + Log2(N) |
-*Remoção* | Log2(N) | Log2(N) | Log2(N) | N + Log2(N) |
-*Procura* | Log2(N) | Log2(N) | 1 | N |
+*Inserção* | 1 | Log2(N) | 1 | Log2(N) |
+*Remoção* | 1 | Log2(N) | 1 | Log2(N) |
+*Procura* | 1 | Log2(N) | 1 | Log2(N) |
 **Syncronização** | Log2(N) | N | Log2(N) | N |
 **Criação da árvore** | N | N | N | N |
 **Validação da árvore** | N | N | N | N |
