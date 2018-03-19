@@ -17,10 +17,8 @@ class CustomAVL
         MerkleTreeNode * search( string hash );
 
 private:
-        CustomAVLNode * rr_rotation( CustomAVLNode * parent );
-        CustomAVLNode * ll_rotation( CustomAVLNode * parent );
-        CustomAVLNode * lr_rotation( CustomAVLNode * parent );
-        CustomAVLNode * rl_rotation( CustomAVLNode * parent );
+        CustomAVLNode * rotate_left( CustomAVLNode * node );
+        CustomAVLNode * rotate_right(CustomAVLNode * node );
 
-        CustomAVLNode * balance( CustomAVLNode * node );
+        int balance( CustomAVLNode * node );
 };

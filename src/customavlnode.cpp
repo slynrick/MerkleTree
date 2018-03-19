@@ -33,6 +33,7 @@ bool CustomAVLNode::setLeft( CustomAVLNode * left )
     if( !left )
         return false;
     this->left = left;
+    this->getLeft()->setParent( this );
     return true;
 }
 
@@ -41,6 +42,7 @@ bool CustomAVLNode::setRight( CustomAVLNode * right )
     if( !right )
         return false;
     this->right = right;
+    this->getRight()->setParent( this );
     return true;
 }
 
@@ -51,8 +53,8 @@ bool CustomAVLNode::setChilden( CustomAVLNode * left, CustomAVLNode * right )
         {
             left->setParent( this );
             right->setParent( this );
-        }
             return true;
+        }
     return false;
 }
 
@@ -63,9 +65,6 @@ void CustomAVLNode::setParent( CustomAVLNode * parent )
 
 unsigned CustomAVLNode::getHeight()
 {
-    if( isLeaf() )
-        return 0;
-
     unsigned l = 0, r = 0;
     if( getLeft() )
         l = getLeft()->getHeight();
@@ -73,6 +72,10 @@ unsigned CustomAVLNode::getHeight()
         r = getRight()->getHeight();
 
     unsigned h =  l >= r ? l : r;
+
+    if( h = 0 )
+        return h;
+
     ++h;
 
     return h;

@@ -54,8 +54,8 @@ bool MerkleTreeNode::setChilden( MerkleTreeNode * left, MerkleTreeNode * right )
         {
             left->setParent( this );
             right->setParent( this );
-        }
             return setHash( calculateHash() );
+        }
     return false;
 }
 

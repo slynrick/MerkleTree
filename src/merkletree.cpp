@@ -38,8 +38,7 @@ bool MerkleTree::insert( string data )
             node->setRight( newnode );
             break;
         }
-
-        if( !node->getLeft() )
+        else if( !node->getLeft() )
         {
             node->setLeft( newnode );
             break;
@@ -49,13 +48,14 @@ bool MerkleTree::insert( string data )
             node->setRight( newnode );
             break;
         }
-
-        int balance = node->getLeft()->getHeight() - node->getRight()->getHeight();
-        if( balance >= 0 )
-            node = node->getRight();
         else
-            node = node->getLeft();
-
+        {
+            int balance = node->getLeft()->getHeight() - node->getRight()->getHeight();
+            if( balance > 0 )
+                node = node->getRight();
+            else
+                node = node->getLeft();
+        }
     }
 
     node = node->getParent();

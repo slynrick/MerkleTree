@@ -10,118 +10,112 @@ CustomAVL::~CustomAVL()
     delete root;
 }
 
-CustomAVLNode * CustomAVL::rr_rotation( CustomAVLNode * parent )
+CustomAVLNode * CustomAVL::rotate_left( CustomAVLNode * node )
 {
-    CustomAVLNode * aux = parent->getRight();
-    parent->setRight( aux->getLeft() );
-    parent->getRight()->setParent( parent );
-    aux->setLeft( parent );
-    aux->getLeft()->setParent( aux );
+    CustomAVLNode * aux = node->getRight();
+    CustomAVLNode * aux2 = aux->getLeft();
+
+    aux->setLeft( node );
+    node->setRight( aux2 );
+
     return aux;
 }
 
-CustomAVLNode * CustomAVL::ll_rotation( CustomAVLNode * parent )
+CustomAVLNode * CustomAVL::rotate_right( CustomAVLNode * node )
 {
-    CustomAVLNode * aux =  parent->getLeft();
-    parent->setLeft( aux->getRight() );
-    parent->getLeft()->setParent( parent );
-    aux->setRight( parent );
-    aux->getRight()->setParent( aux );
+    CustomAVLNode * aux =  node->getLeft();
+    CustomAVLNode * aux2 = aux->getRight();
+
+    aux->setRight( node );
+    node->setLeft( aux2 );
+
     return aux;
 }
 
-CustomAVLNode * CustomAVL::lr_rotation( CustomAVLNode * parent )
+int CustomAVL::balance( CustomAVLNode * node )
 {
-    CustomAVLNode * aux = parent->getLeft();
-    parent->setLeft( rr_rotation( aux ) );
-    parent->getLeft()->setParent( parent );
-    return ll_rotation( parent );
-}
+    if( !node )
+        return 0;
 
-CustomAVLNode * CustomAVL::rl_rotation( CustomAVLNode * parent )
-{
-    CustomAVLNode * aux = parent->getRight();
-    parent->setRight( ll_rotation( aux ) );
-    parent->getRight()->setParent( parent );
-    return rr_rotation( parent );
-}
+    int lh = 0, rh = 0;
 
-CustomAVLNode * CustomAVL::balance( CustomAVLNode * node )
-{
+    if( node->getLeft() )
+        lh = node->getLeft()->getHeight();
+    if( node->getRight() )
+        rh = node->getRight()->getHeight();
 
-    int hl = node->getLeft() ? node->getLeft()->getHeight() : 0;
-    int hr = node->getRight() ? node->getRight()->getHeight() : 0;
-    int balance = hl - hr;
+    int bf = lh - rh;
 
-    if( balance > 1 )
-    {
-        int hl2 = node->getLeft()->getLeft() ? node->getLeft()->getLeft()->getHeight() : 0;
-        int hr2 = node->getLeft()->getRight() ? node->getLeft()->getRight()->getHeight() : 0;
-        int balance2 = hl2 - hr2;
-
-        if( balance2 > 0 )
-            node = ll_rotation( node );
-        else
-            node = lr_rotation( node );
-    }
-    else if( balance < -1 )
-    {
-        int hl2 = node->getRight()->getLeft() ? node->getRight()->getLeft()->getHeight() : 0;
-        int hr2 = node->getRight()->getRight() ? node->getRight()->getRight()->getHeight() : 0;
-        int balance2 = hl2 - hr2;
-
-        if( balance2 > 0 )
-            node = rl_rotation( node );
-        else
-            node = rr_rotation( node );
-    }
-
-    return node;
+    return bf;
 }
 
 bool CustomAVL::insert( MerkleTreeNode * mt_node )
 {
+    CustomAVLNode * newNode = new CustomAVLNode();
+    newNode->set_mt_node( mt_node );
+
     if( !getRoot() )
     {
-        this->root = new CustomAVLNode();
-        this->root->set_mt_node( mt_node );
+        this->root = newNode;
         return true;
     }
-    else
+
+    CustomAVLNode * currNode = getRoot();
+
+    while( currNode )
     {
-        CustomAVLNode * node = getRoot();
-        while( node )
+        if( mt_node->getHash() <= currNode->get_mt_node()->getHash() )
         {
-            if( node->get_mt_node()->getHash().compare( mt_node->getHash() ) < 0 )
+            if( !currNode->getLeft() )
             {
-                if( !node->getLeft() )
-                {
-                    CustomAVLNode * new_node = new CustomAVLNode();
-                    new_node->set_mt_node( mt_node );
-                    new_node->setParent( node );
-                    node->setLeft( new_node );
-                    node = balance( node );
-                    return true;
-                }
-                node = node->getLeft();
+                currNode->setLeft( newNode );
+                break;
             }
-            else
+            currNode = currNode->getLeft();
+        }
+        else
+        {
+            if( !currNode->getRight() )
             {
-                if( !node->getRight() )
-                {
-                    CustomAVLNode * new_node = new CustomAVLNode();
-                    new_node->set_mt_node( mt_node );
-                    new_node->setParent( node );
-                    node->setRight( new_node );
-                    node = balance( node );
-                    return true;
-                }
-                node = node->getRight();
+                currNode->setRight( newNode );
+                break;
             }
+            currNode = currNode->getRight();
         }
     }
 
-    return false;
+    while( currNode )
+    {
+        int bf = balance( currNode );
+
+        if( bf > 1 )
+        {
+            if( mt_node->getHash() <= currNode->getLeft()->get_mt_node()->getHash() ) // ll case
+                currNode = rotate_right( currNode );
+
+            if( mt_node->getHash() > currNode->getRight()->get_mt_node()->getHash() ) // lr case
+            {
+                currNode->setLeft( rotate_left( currNode->getLeft() ) );
+                currNode = rotate_right( currNode );
+            }
+        }
+
+        if( bf < -1 )
+        {
+            if( mt_node->getHash() > currNode->getRight()->get_mt_node()->getHash() ) // rr case
+                currNode = rotate_left( currNode );
+
+            if( mt_node->getHash() <= currNode->getLeft()->get_mt_node()->getHash() ) // rl case
+            {
+                currNode->setRight( rotate_right( currNode->getRight() ) );
+                currNode = rotate_left( currNode );
+            }
+        }
+
+        currNode = currNode->getParent();
+    }
+
+    return true;
 }
 
 bool CustomAVL::remove( MerkleTreeNode * mt_node )
@@ -132,10 +126,10 @@ bool CustomAVL::remove( MerkleTreeNode * mt_node )
     CustomAVLNode * node = getRoot();
     while( node && node->get_mt_node()->getHash().compare( mt_node->getHash() ) != 0 )
     {
-        if( node->get_mt_node()->getHash().compare( mt_node->getHash() ) < 0 )
-            node = node->getLeft();
-        else if( node->get_mt_node()->getHash().compare( mt_node->getHash() ) > 0 )
+        if( node->get_mt_node()->getHash() < mt_node->getHash() )
             node = node->getRight();
+        else if( node->get_mt_node()->getHash() > mt_node->getHash() )
+            node = node->getLeft();
     }
 
     if( node )
@@ -149,10 +143,10 @@ MerkleTreeNode * CustomAVL::search( string hash )
     CustomAVLNode * node = getRoot();
     while( node && node->get_mt_node()->getHash().compare( hash ) != 0 )
     {
-        if( node->get_mt_node()->getHash().compare( hash ) < 0 )
-            node = node->getLeft();
-        else if( node->get_mt_node()->getHash().compare( hash ) > 0 )
+        if( node->get_mt_node()->getHash() < hash )
             node = node->getRight();
+        else if( node->get_mt_node()->getHash() > hash )
+            node = node->getLeft();
     }
 
     if( node )
@@ -160,5 +154,3 @@ MerkleTreeNode * CustomAVL::search( string hash )
 
     return NULL;
 }
-
-
