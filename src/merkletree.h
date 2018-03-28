@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <vector>
 
+#include "merkletreenode.h"
 #include "customavl.h"
 
 class MerkleTree
@@ -11,8 +12,8 @@ class MerkleTree
         MerkleTree();
         ~MerkleTree();
 
-        MerkleTreeNode * getRoot(){ return root; }
-        CustomAVL * getLeaves(){ return leaves; }
+        MerkleTreeNode * getRoot(){ return this->root; }
+        CustomAVL * getLeaves(){ return this->leaves; }
         unsigned getHeight(){ return this->root->getHeight(); }
 
         bool insert(string data );

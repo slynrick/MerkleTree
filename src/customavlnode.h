@@ -1,10 +1,9 @@
 #include <cstdlib>
 #include <string>
 
-#include "merkletreenode.h"
-
 using namespace std;
 
+class MerkleTreeNode;
 class CustomAVLNode
 {
     CustomAVLNode * left;
@@ -23,17 +22,19 @@ class CustomAVLNode
 
         unsigned getHeight();
 
+        int balanceFactor();
+
         bool set_mt_node( MerkleTreeNode * node );
-        MerkleTreeNode * get_mt_node(){ return this->mt_node; }
+        MerkleTreeNode * get_mt_node(){ return mt_node; }
 
         bool setLeft( CustomAVLNode * right );
-        CustomAVLNode * getLeft(){ return this->left; }
+        CustomAVLNode * getLeft(){ return left; }
 
         bool setRight( CustomAVLNode * right );
-        CustomAVLNode * getRight(){ return this->right; }
+        CustomAVLNode * getRight(){ return right; }
 
         void setParent( CustomAVLNode * parent );
-        CustomAVLNode * getParent(){ return this->parent; }
+        CustomAVLNode * getParent(){ return parent; }
 
         bool setChilden( CustomAVLNode * left, CustomAVLNode * right );
 

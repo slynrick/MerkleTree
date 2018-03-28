@@ -10,9 +10,9 @@ MerkleTreeNode::MerkleTreeNode()
 
 MerkleTreeNode::~MerkleTreeNode()
 {
-    if( this->getLeft() )
+    if( getLeft() )
         delete this->left;
-    if( this->getRight() )
+    if( getRight() )
         delete this->right;
     this->data = string();
     this->parent = NULL;
@@ -34,7 +34,7 @@ bool MerkleTreeNode::setLeft( MerkleTreeNode * left )
     if( !left )
         return false;
     this->left = left;
-    this->getLeft()->setParent( this );
+    getLeft()->setParent( this );
     return setHash( calculateHash() );
 }
 
@@ -43,7 +43,7 @@ bool MerkleTreeNode::setRight( MerkleTreeNode * right )
     if( !right )
         return false;
     this->right = right;
-    this->getRight()->setParent( this );
+    getRight()->setParent( this );
     return setHash( calculateHash() );
 }
 
@@ -75,20 +75,20 @@ string MerkleTreeNode::calculateHash()
     string tohash = string();
     if( getLeft() && getRight() )
     {
-        tohash.append( this->getLeft()->getData() );
-        tohash.append( this->getRight()->getData() );
+        tohash.append( getLeft()->getData() );
+        tohash.append( getRight()->getData() );
         return Hash::hash( tohash );
     }
     else if( getLeft() )
     {
-        tohash.append( this->getLeft()->getData() );
-        tohash.append( this->getLeft()->getData() );
+        tohash.append( getLeft()->getData() );
+        tohash.append( getLeft()->getData() );
         return Hash::hash( tohash );
     }
     else
     {
-        tohash.append( this->getRight()->getData() );
-        tohash.append( this->getRight()->getData() );
+        tohash.append( getRight()->getData() );
+        tohash.append( getRight()->getData() );
         return Hash::hash( tohash );
     }
 

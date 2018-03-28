@@ -19,6 +19,4 @@ class CustomAVL
 private:
         CustomAVLNode * rotate_left( CustomAVLNode * node );
         CustomAVLNode * rotate_right(CustomAVLNode * node );
-
-        int balance( CustomAVLNode * node );
 };

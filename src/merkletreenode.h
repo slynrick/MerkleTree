@@ -25,22 +25,22 @@ class MerkleTreeNode
         unsigned getHeight();
 
         bool setData( string data );
-        string getData(){ return this->data; }
+        string getData(){ return data; }
 
-        bool setHash( string hash ){ if( hash.empty() ) return false; this->hash = hash; return true; }
+        bool setHash( string hash ){ if( hash.empty() ) return false; hash = hash; return true; }
         string calculateHash();
-        string getHash(){ return this->hash; }
+        string getHash(){ return hash; }
 
         bool setChilden( MerkleTreeNode * left, MerkleTreeNode * right );
 
         bool setLeft( MerkleTreeNode * right );
-        MerkleTreeNode * getLeft(){ return this->left; }
+        MerkleTreeNode * getLeft(){ return left; }
 
         bool setRight( MerkleTreeNode * right );
-        MerkleTreeNode * getRight(){ return this->right; }
+        MerkleTreeNode * getRight(){ return right; }
 
         void setParent( MerkleTreeNode * parent );
-        MerkleTreeNode * getParent(){ return this->parent; }
+        MerkleTreeNode * getParent(){ return parent; }
 
         bool isValid();
         bool sync( MerkleTreeNode * newNode );

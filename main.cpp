@@ -3,7 +3,6 @@
 #include <iostream>
 #include <chrono>
 #include <sstream>
-#include <vector>
 #include <cmath>
 #include <iomanip>
 #include <fstream>
@@ -34,146 +33,107 @@ vector<string> creatingData( int len )
     return data;
 }
 
-vector<MerkleTree*> creatingMerkleTree()
-{
-    cout << "Time to build a merkletree" << endl;
-    srand (time(NULL));
-    vector<MerkleTree*> trees;
-
-    ofstream buildTreeFile;
-    buildTreeFile.open( "buildTreeFile.dat", ios::out );
-
-    for( int i = 1; i < 100; ++i )
-    {
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        MerkleTree * tree = new MerkleTree();
-        tree->build( creatingData( i ) );
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-
-        trees.push_back( tree );
-
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << "Leaves: " << i << " duration: " << fixed << setprecision( PRECISION ) << time_span.count() << "s" << endl << endl;
-
-        buildTreeFile << i << "\t" << time_span.count() << endl;
-    }
-    buildTreeFile.close();
-    return trees;
+double creatingMerkleTree( MerkleTree * tree, int len )
+{    
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    tree->build( creatingData( len ) );
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    return time_span.count();
 }
 
-void validatingMerkleTree( const vector<MerkleTree*> &trees )
+double validatingMerkleTree( MerkleTree * tree )
 {
-    cout << "Time to validate all trees" << endl;
-
-    ofstream validateTreeFile;
-    validateTreeFile.open( "validateTreeFile.dat", ios::out );
-
-    for( int i = 0; i < trees.size(); ++i )
-    {
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        trees[i]->isValid();
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << "Tree : " << i << " duration: " << fixed << setprecision( PRECISION ) << time_span.count() << "s" << endl << endl;
-
-        validateTreeFile << i << "\t" << time_span.count() << endl;
-    }
-    validateTreeFile.close();
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    tree->isValid();
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    return time_span.count();
 }
 
-void syncMerkleTree( const vector<MerkleTree*> &trees )
+double syncMerkleTree( MerkleTree * tree, MerkleTree * old )
 {
-    cout << "Time to sync all trees" << endl;
-    // sync all trees with the biggest one
-
-    ofstream syncTreeFile;
-    syncTreeFile.open( "syncTreeFile.dat", ios::out );
-
-    for( int i = 0; i < trees.size(); ++i )
-    {
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        trees[i]->syncronize( trees.back() );
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << "Tree : " << i << " duration: " << fixed << setprecision( PRECISION ) << time_span.count() << "s" << endl << endl;
-
-        syncTreeFile << i << "\t" << time_span.count() << endl;
-    }
-    syncTreeFile.close();
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    tree->syncronize( old );
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    return time_span.count();
 }
 
 
-void insertDataMerkleTree( const vector<MerkleTree*> &trees , string data )
+double insertDataMerkleTree( MerkleTree * tree , string data )
 {
-    cout << "Time to insert data" << endl;
-
-    ofstream insertDataTreeFile;
-    insertDataTreeFile.open( "insertDataTreeFile.dat", ios::out );
-
-    for( int i = 0; i < trees.size(); ++i )
-    {
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        trees[i]->insert( data );
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << "Tree : " << i << " duration: " << fixed << setprecision( PRECISION ) << time_span.count() << "s" << endl << endl;
-
-        insertDataTreeFile << i << "\t" << time_span.count() << endl;
-    }
-    insertDataTreeFile.close();
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    tree->insert( data );
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    return time_span.count();
 }
 
-void deleteDataMerkleTree( const vector<MerkleTree*> &trees, string hash )
+pair<double,bool> deleteDataMerkleTree( MerkleTree * tree, string hash )
 {
-    cout << "Time to delete data" << endl;
-
-    ofstream deleteDataTreeFile;
-    deleteDataTreeFile.open( "deleteDataTreeFile.dat", ios::out );
-
-    for( int i = 0; i < trees.size(); ++i )
-    {
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        bool find = trees[i]->remove( hash );
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << "Tree : " << i << " duration: " << fixed << setprecision( PRECISION ) << time_span.count() << "s" << " found? " << find << endl << endl;
-
-        deleteDataTreeFile << i << "\t" << time_span.count() << endl;
-    }
-    deleteDataTreeFile.close();
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    bool find = tree->remove( hash );
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    return make_pair( time_span.count(), find );
 }
 
-void searchDataMerkleTree( const vector<MerkleTree*> &trees, string hash )
+pair<double,bool> searchDataMerkleTree( MerkleTree * tree, string hash )
 {
-    cout << "Time to search data" << endl;
-
-    ofstream searchDataTreeFile;
-    searchDataTreeFile.open( "searchDataTreeFile.dat", ios::out );
-
-    for( int i = 0; i < trees.size(); ++i )
-    {
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        bool find = trees[i]->search( hash ) != NULL;
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        cout << "Tree : " << i << " duration: " << fixed << setprecision( PRECISION ) << time_span.count() << "s" << " found? " << find << endl << endl;
-
-        searchDataTreeFile << i << "\t" << time_span.count() << endl;
-    }
-    searchDataTreeFile.close();
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    bool find = tree->search( hash ) != NULL;
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    return make_pair( time_span.count(), find );
 }
 
 int main( int argv, char** argc )
 {
     cout << "Initializing Test Cases" << endl << endl;
-    vector<MerkleTree*> trees = creatingMerkleTree();
 
-    validatingMerkleTree( trees );
-    syncMerkleTree( trees );
+    ofstream validateTreeFile;
+    validateTreeFile.open( "validateTreeFile.dat", ios::out );
+    ofstream buildTreeFile;
+    buildTreeFile.open( "buildTreeFile.dat", ios::out );
+    ofstream syncTreeFile;
+    syncTreeFile.open( "syncTreeFile.dat", ios::out );
+    ofstream insertDataTreeFile;
+    insertDataTreeFile.open( "insertDataTreeFile.dat", ios::out );
+    ofstream searchDataTreeFile;
+    searchDataTreeFile.open( "searchDataTreeFile.dat", ios::out );
+    ofstream deleteDataTreeFile;
+    deleteDataTreeFile.open( "deleteDataTreeFile.dat", ios::out );
 
-    insertDataMerkleTree( trees, "data" );
-    searchDataMerkleTree( trees, Hash::hash( FIND_THIS ) );
-    deleteDataMerkleTree( trees, Hash::hash( FIND_THIS ) );
+    MerkleTree * baseTree = new MerkleTree();
+    creatingMerkleTree( baseTree, 1000 );
+
+    for( int i = 0; i < 4000; i += 100 )
+    {
+        cout << "Testing Merkle Tree with " << i << " elements" << endl;
+        MerkleTree * tree = new MerkleTree();
+        buildTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << creatingMerkleTree( tree, i ) << endl;
+
+
+        validateTreeFile << i << "\t" << fixed << setprecision( PRECISION ) <<  validatingMerkleTree( tree ) << endl;
+        syncTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << syncMerkleTree( baseTree, tree ) << endl;
+        insertDataTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << insertDataMerkleTree( tree, "data" ) << endl;
+
+        pair<double,bool> search = searchDataMerkleTree( tree, Hash::hash( FIND_THIS ) );
+        searchDataTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << search.first << "\t" << search.second << endl;
+
+        pair<double,bool> del = deleteDataMerkleTree( tree, Hash::hash( FIND_THIS ) );
+        deleteDataTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << del.first << "\t" << del.second << endl;
+
+        delete tree;
+    }
+
+    validateTreeFile.close();
+    buildTreeFile.close();
+    syncTreeFile.close();
+    insertDataTreeFile.close();
+    searchDataTreeFile.close();
+    deleteDataTreeFile.close();
 
     cout << "End" << endl << endl;
     return 0;

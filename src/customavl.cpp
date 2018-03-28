@@ -1,5 +1,7 @@
 #include "customavl.h"
 
+#include "merkletreenode.h"
+
 CustomAVL::CustomAVL()
 {
     this->root = NULL;
@@ -7,7 +9,8 @@ CustomAVL::CustomAVL()
 
 CustomAVL::~CustomAVL()
 {
-    delete root;
+    if( getRoot() )
+        delete this->root;
 }
 
 CustomAVLNode * CustomAVL::rotate_left( CustomAVLNode * node )
@@ -30,23 +33,6 @@ CustomAVLNode * CustomAVL::rotate_right( CustomAVLNode * node )
     node->setLeft( aux2 );
 
     return aux;
-}
-
-int CustomAVL::balance( CustomAVLNode * node )
-{
-    if( !node )
-        return 0;
-
-    int lh = 0, rh = 0;
-
-    if( node->getLeft() )
-        lh = node->getLeft()->getHeight();
-    if( node->getRight() )
-        rh = node->getRight()->getHeight();
-
-    int bf = lh - rh;
-
-    return bf;
 }
 
 bool CustomAVL::insert( MerkleTreeNode * mt_node )
@@ -84,9 +70,9 @@ bool CustomAVL::insert( MerkleTreeNode * mt_node )
         }
     }
 
-    while( currNode )
+    while( !currNode->isRoot() )
     {
-        int bf = balance( currNode );
+        int bf = currNode->balanceFactor();
 
         if( bf > 1 )
         {

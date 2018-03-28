@@ -8,8 +8,10 @@ MerkleTree::MerkleTree()
 
 MerkleTree::~MerkleTree()
 {
-    delete root;
-    delete this->leaves;
+    if( getRoot() )
+        delete this->root;
+    if( getLeaves() )
+        delete this->leaves;
 }
 
 bool MerkleTree::insert( string data )
@@ -20,13 +22,13 @@ bool MerkleTree::insert( string data )
     MerkleTreeNode * newnode = new MerkleTreeNode();
     newnode->setData( data );
 
-    if( !this->getRoot() )
+    if( !getRoot() )
     {
-        root = newnode;
-        return leaves->insert( newnode );
+        this->root = newnode;
+        return getLeaves()->insert( newnode );
     }
 
-    MerkleTreeNode * node = this->getRoot();
+    MerkleTreeNode * node = getRoot();
 
     while( node )
     {
@@ -66,7 +68,7 @@ bool MerkleTree::insert( string data )
         node = node->getParent();
     }
 
-    return leaves->insert( newnode );
+    return getLeaves()->insert( newnode );
 }
 
 bool MerkleTree::remove( string hash )
@@ -81,14 +83,14 @@ bool MerkleTree::remove( string hash )
             parent = aux->getParent();
             delete aux;
         }
-        return leaves->remove( node );
+        return getLeaves()->remove( node );
     }
     return false;
 }
 
 MerkleTreeNode * MerkleTree::search( string hash )
 {
-    return leaves->search( hash );
+    return getLeaves()->search( hash );
 }
 
 bool MerkleTree::build( vector<string> data )
@@ -108,7 +110,7 @@ bool MerkleTree::isValid()
     if( !getRoot() )
         return false;
 
-    return this->getRoot()->isValid();
+    return getRoot()->isValid();
 }
 
 bool MerkleTree::syncronize( MerkleTree * tree )

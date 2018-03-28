@@ -10,12 +10,26 @@ CustomAVLNode::CustomAVLNode()
 
 CustomAVLNode::~CustomAVLNode()
 {
-    if( this->getLeft() )
+    if( getLeft() )
         delete this->left;
-    if( this->getRight() )
+    if( getRight() )
         delete this->right;
     this->mt_node = NULL;
     this->parent = NULL;
+}
+
+int CustomAVLNode::balanceFactor()
+{
+        int lh = 0, rh = 0;
+
+    if( getLeft() )
+        lh = getLeft()->getHeight();
+    if( getRight() )
+        rh = getRight()->getHeight();
+
+    int bf = lh - rh;
+
+    return bf;
 }
 
 bool CustomAVLNode::set_mt_node( MerkleTreeNode * node )
@@ -33,7 +47,7 @@ bool CustomAVLNode::setLeft( CustomAVLNode * left )
     if( !left )
         return false;
     this->left = left;
-    this->getLeft()->setParent( this );
+    getLeft()->setParent( this );
     return true;
 }
 
@@ -42,7 +56,7 @@ bool CustomAVLNode::setRight( CustomAVLNode * right )
     if( !right )
         return false;
     this->right = right;
-    this->getRight()->setParent( this );
+    getRight()->setParent( this );
     return true;
 }
 
@@ -65,6 +79,7 @@ void CustomAVLNode::setParent( CustomAVLNode * parent )
 
 unsigned CustomAVLNode::getHeight()
 {
+
     unsigned l = 0, r = 0;
     if( getLeft() )
         l = getLeft()->getHeight();
@@ -73,8 +88,8 @@ unsigned CustomAVLNode::getHeight()
 
     unsigned h =  l >= r ? l : r;
 
-    if( h = 0 )
-        return h;
+    if( h == 0 )
+        return 0;
 
     ++h;
 
