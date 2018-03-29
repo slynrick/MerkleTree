@@ -92,25 +92,32 @@ int main( int argv, char** argc )
 {
     cout << "Initializing Test Cases" << endl << endl;
 
+    system_clock::time_point today = system_clock::now();
+    time_t tt = system_clock::to_time_t ( today );
+
+    char ts[21];
+    strftime( ts, 21, "%F_%X-", localtime(&tt) );
+    string prefix = ts;
+    
     ofstream validateTreeFile;
-    validateTreeFile.open( "validateTreeFile.dat", ios::out );
+    validateTreeFile.open( prefix + "01-validateTreeFile.dat", ios::out );
     ofstream buildTreeFile;
-    buildTreeFile.open( "buildTreeFile.dat", ios::out );
+    buildTreeFile.open( prefix + "00-buildTreeFile.dat", ios::out );
     ofstream syncTreeFile;
-    syncTreeFile.open( "syncTreeFile.dat", ios::out );
+    syncTreeFile.open( prefix + "02-syncTreeFile.dat", ios::out );
     ofstream insertDataTreeFile;
-    insertDataTreeFile.open( "insertDataTreeFile.dat", ios::out );
+    insertDataTreeFile.open( prefix + "03-insertDataTreeFile.dat", ios::out );
     ofstream searchDataTreeFile;
-    searchDataTreeFile.open( "searchDataTreeFile.dat", ios::out );
+    searchDataTreeFile.open( prefix + "04-searchDataTreeFile.dat", ios::out );
     ofstream deleteDataTreeFile;
-    deleteDataTreeFile.open( "deleteDataTreeFile.dat", ios::out );
+    deleteDataTreeFile.open( prefix + "05-deleteDataTreeFile.dat", ios::out );
 
     MerkleTree * baseTree = new MerkleTree();
     creatingMerkleTree( baseTree, 1000 );
 
     for( int i = 0; i < 4000; i += 100 )
     {
-        cout << "Testing Merkle Tree with " << i << " elements" << endl;
+        cout << "Testing Merkle Tree with " << i << " leaves" << endl;
         MerkleTree * tree = new MerkleTree();
         buildTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << creatingMerkleTree( tree, i ) << endl;
 

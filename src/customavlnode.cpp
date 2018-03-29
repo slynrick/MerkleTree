@@ -90,8 +90,6 @@ unsigned CustomAVLNode::getHeight()
 
     if( h == 0 )
         return 0;
-
-    ++h;
-
-    return h;
+    else
+        return ++h;
 }
