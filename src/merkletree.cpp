@@ -76,6 +76,9 @@ bool MerkleTree::remove( string hash )
     MerkleTreeNode * node = search( hash );
     if( node )
     {
+        if( node->isRoot() )
+            return getLeaves()->remove( node );
+
         MerkleTreeNode * parent = node->getParent();
         while( parent->getNumChidren() < 2 )
         {

@@ -27,7 +27,7 @@ class MerkleTreeNode
         bool setData( string data );
         string getData(){ return data; }
 
-        bool setHash( string hash ){ if( hash.empty() ) return false; hash = hash; return true; }
+        bool setHash( string hash ){ if( hash.empty() ) return false; this->hash = hash; return true; }
         string calculateHash();
         string getHash(){ return hash; }
 

@@ -2,6 +2,8 @@
 
 #include "merkletreenode.h"
 
+#include <cstring>
+
 CustomAVL::CustomAVL()
 {
     this->root = NULL;
@@ -50,7 +52,7 @@ bool CustomAVL::insert( MerkleTreeNode * mt_node )
 
     while( currNode )
     {
-        if( mt_node->getHash() <= currNode->get_mt_node()->getHash() )
+        if( strcmp( mt_node->getHash().c_str(), currNode->get_mt_node()->getHash().c_str() ) <= 0 )
         {
             if( !currNode->getLeft() )
             {
@@ -76,10 +78,10 @@ bool CustomAVL::insert( MerkleTreeNode * mt_node )
 
         if( bf > 1 )
         {
-            if( mt_node->getHash() <= currNode->getLeft()->get_mt_node()->getHash() ) // ll case
+            if( strcmp( mt_node->getHash().c_str(), currNode->getLeft()->get_mt_node()->getHash().c_str() ) <= 0 ) // ll case
                 currNode = rotate_right( currNode );
 
-            if( mt_node->getHash() > currNode->getRight()->get_mt_node()->getHash() ) // lr case
+            if( strcmp( mt_node->getHash().c_str(), currNode->getRight()->get_mt_node()->getHash().c_str() ) > 0 ) // lr case
             {
                 currNode->setLeft( rotate_left( currNode->getLeft() ) );
                 currNode = rotate_right( currNode );
@@ -88,10 +90,10 @@ bool CustomAVL::insert( MerkleTreeNode * mt_node )
 
         if( bf < -1 )
         {
-            if( mt_node->getHash() > currNode->getRight()->get_mt_node()->getHash() ) // rr case
+            if( strcmp( mt_node->getHash().c_str(), currNode->getRight()->get_mt_node()->getHash().c_str() ) > 0 ) // rr case
                 currNode = rotate_left( currNode );
 
-            if( mt_node->getHash() <= currNode->getLeft()->get_mt_node()->getHash() ) // rl case
+            if( strcmp( mt_node->getHash().c_str(), currNode->getLeft()->get_mt_node()->getHash().c_str() ) <= 0 ) // rl case
             {
                 currNode->setRight( rotate_right( currNode->getRight() ) );
                 currNode = rotate_left( currNode );
@@ -109,34 +111,71 @@ bool CustomAVL::remove( MerkleTreeNode * mt_node )
     if( !mt_node )
         return false;
 
-    CustomAVLNode * node = getRoot();
-    while( node && node->get_mt_node()->getHash().compare( mt_node->getHash() ) != 0 )
-    {
-        if( node->get_mt_node()->getHash() < mt_node->getHash() )
-            node = node->getRight();
-        else if( node->get_mt_node()->getHash() > mt_node->getHash() )
-            node = node->getLeft();
-    }
+    return true;
+
+    CustomAVLNode * node = findNode( mt_node->getHash() );
 
     if( node )
-        delete node;
+    {
+        if( node->isLeaf() )
+        {
+            delete node;
+            return true;
+        }
 
-    return true;
+        if( node->getNumChidren() == 1 )
+        {
+            CustomAVLNode * parent = node->getParent();
+            CustomAVLNode * child = node->getLeft() ? node->getLeft() : node->getRight();
+            if( parent )
+            {
+                if( parent->getLeft() == node )
+                    parent->setLeft( child );
+                else
+                    parent->setRight( child );
+            }
+            else
+            {
+                CustomAVLNode * child = node->getLeft() ? node->getLeft() : node->getRight();
+                this->root = child;
+            }
+            node->setChilden( NULL, NULL );
+            node->setParent( NULL );
+            delete node;
+            return true;
+        }
+
+        if( node->getNumChidren() == 2 )
+        {
+
+            delete node;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 MerkleTreeNode * CustomAVL::search( string hash )
 {
-    CustomAVLNode * node = getRoot();
-    while( node && node->get_mt_node()->getHash().compare( hash ) != 0 )
-    {
-        if( node->get_mt_node()->getHash() < hash )
-            node = node->getRight();
-        else if( node->get_mt_node()->getHash() > hash )
-            node = node->getLeft();
-    }
-
+    CustomAVLNode * node = findNode( hash );
     if( node )
         return node->get_mt_node();
+    return NULL;
+}
+
+CustomAVLNode * CustomAVL::findNode( string value )
+{
+    CustomAVLNode * node = getRoot();
+    while( node )
+    {
+        if( strcmp( value.c_str(), node->get_mt_node()->getHash().c_str() ) > 0 )
+            node = node->getRight();
+        else if( strcmp( value.c_str(), node->get_mt_node()->getHash().c_str() ) < 0 )
+            node = node->getLeft();
+        else
+            return node;
+    }
 
     return NULL;
 }

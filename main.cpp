@@ -17,18 +17,14 @@ using namespace std::chrono;
 
 vector<string> creatingData( int len )
 {
-    if( len == 0 )
-        return vector<string>();
-
     vector<string> data;
     stringstream ss;
-    for( int i = 0; i < len - 1; ++i )
+    for( int i = 0; i < len; ++i )
     {
         ss << (int)pow( 10, len ) + i;
-        string teste = ss.str();
-        data.push_back( teste );
+        string test = ss.str();
+        data.push_back( test );
     }
-    data.push_back( FIND_THIS );
 
     return data;
 }
@@ -115,7 +111,7 @@ int main( int argv, char** argc )
     MerkleTree * baseTree = new MerkleTree();
     creatingMerkleTree( baseTree, 1000 );
 
-    for( int i = 0; i < 4000; i += 100 )
+    for( int i = 0; i <= 4000; i += 1 )
     {
         cout << "Testing Merkle Tree with " << i << " leaves" << endl;
         MerkleTree * tree = new MerkleTree();
@@ -124,7 +120,7 @@ int main( int argv, char** argc )
 
         validateTreeFile << i << "\t" << fixed << setprecision( PRECISION ) <<  validatingMerkleTree( tree ) << endl;
         syncTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << syncMerkleTree( baseTree, tree ) << endl;
-        insertDataTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << insertDataMerkleTree( tree, "data" ) << endl;
+        insertDataTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << insertDataMerkleTree( tree, FIND_THIS ) << endl;
 
         pair<double,bool> search = searchDataMerkleTree( tree, Hash::hash( FIND_THIS ) );
         searchDataTreeFile << i << "\t" << fixed << setprecision( PRECISION ) << search.first << "\t" << search.second << endl;
