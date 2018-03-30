@@ -111,7 +111,7 @@ int main( int argv, char** argc )
     MerkleTree * baseTree = new MerkleTree();
     creatingMerkleTree( baseTree, 1000 );
 
-    for( int i = 0; i <= 4000; i += 1 )
+    for( int i = 0; i <= 4000; i += 100 )
     {
         cout << "Testing Merkle Tree with " << i << " leaves" << endl;
         MerkleTree * tree = new MerkleTree();

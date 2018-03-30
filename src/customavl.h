@@ -5,14 +5,16 @@
 
 class CustomAVL
 {
-    CustomAVLNode * root;
+     CustomAVLNode * root;
     public:
         CustomAVL();
         ~CustomAVL();
 
         CustomAVLNode * getRoot(){ return root; }
 
+        bool insert( CustomAVLNode * newNode );
         bool insert( MerkleTreeNode * mt_node  );
+        bool remove( CustomAVLNode * node );
         bool remove( MerkleTreeNode * mt_node );
         MerkleTreeNode * search( string hash );
 
