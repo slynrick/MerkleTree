@@ -21,6 +21,10 @@ class MerkleTree
         MerkleTreeNode * search( string hash );
         bool build( vector<string> data );
         bool isValid();
-        bool syncronize( MerkleTree * newTree );
+        void syncronize( MerkleTree * newTree );
         vector<string> auditProof( string hash );
+
+
+    private:
+        void syncNode( MerkleTreeNode * oldNode, MerkleTreeNode * newNode );
 };

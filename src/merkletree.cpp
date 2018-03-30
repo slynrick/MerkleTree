@@ -147,15 +147,43 @@ bool MerkleTree::isValid()
     return getRoot()->isValid();
 }
 
-bool MerkleTree::syncronize( MerkleTree * tree )
+void MerkleTree::syncNode( MerkleTreeNode * oldNode, MerkleTreeNode * newNode )
 {
-    if( !getRoot() || !tree->getRoot() )
-        return false;
+    if( !oldNode )
+        if( newNode )
+        {
+            if( newNode->isLeaf() )
+                getLeaves()->insert( newNode );
+            oldNode = newNode;
+        }
 
-    if( getRoot()->getHash() == tree->getRoot()->getHash() )
-        return true;
+    if( !newNode )
+        if( oldNode )
+        {
+            if( oldNode->isLeaf() )
+                getLeaves()->remove( oldNode );
+            oldNode = NULL;
+            delete oldNode;
+        }
 
-    return getRoot()->sync( tree->getRoot() );
+    if( !oldNode || !newNode )
+        return;
+
+    if( oldNode->getHash() == newNode->getHash() )
+        return;
+
+    oldNode->setData( newNode->getData() );
+    oldNode->setHash( newNode->getHash() );
+
+    syncNode( oldNode->getLeft(), newNode->getLeft() );
+    syncNode( oldNode->getRight(), newNode->getRight() );
+
+    oldNode->setChilden( newNode->getLeft(), newNode->getRight() );
+}
+
+void MerkleTree::syncronize( MerkleTree * tree )
+{
+    syncNode( getRoot(), tree->getRoot() );
 }
 
 vector<string> MerkleTree::auditProof( string hash )

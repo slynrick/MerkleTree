@@ -51,11 +51,7 @@ bool MerkleTreeNode::setChilden( MerkleTreeNode * left, MerkleTreeNode * right )
 {
     if( setLeft( left ) )
         if( setRight( right ) )
-        {
-            left->setParent( this );
-            right->setParent( this );
             return setHash( calculateHash() );
-        }
     return false;
 }
 
@@ -107,11 +103,6 @@ bool MerkleTreeNode::isValid()
     bool validr = node->getRight() ? node->getRight()->isValid() : true;
 
     return ( validl && validr );
-}
-
-bool MerkleTreeNode::sync( MerkleTreeNode * newNode )
-{
-    return true;
 }
 
 unsigned MerkleTreeNode::getHeight()

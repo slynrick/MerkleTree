@@ -43,5 +43,4 @@ class MerkleTreeNode
         MerkleTreeNode * getParent(){ return parent; }
 
         bool isValid();
-        bool sync( MerkleTreeNode * newNode );
 };

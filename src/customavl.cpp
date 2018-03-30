@@ -157,6 +157,8 @@ bool CustomAVL::remove( CustomAVLNode * node )
 
         node->setChilden( NULL, NULL );
         node->setParent( NULL );
+        node = NULL;
+        delete node;
         return true;
     }
 
