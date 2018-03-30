@@ -1,5 +1,7 @@
 #include "merkletree.h"
 
+#include <deque>
+
 MerkleTree::MerkleTree()
 {
     this->root = NULL;
@@ -101,9 +103,38 @@ bool MerkleTree::build( vector<string> data )
     if( data.size() == 0 )
         return false;
 
+    deque<MerkleTreeNode*> d;
     for( int i = 0; i < data.size(); ++i )
-        if( !insert( data[i] ) )
-            return false;
+    {
+        MerkleTreeNode * node = new MerkleTreeNode();
+        node->setData( data[i] );
+        d.push_back( node );
+    }
+
+    while( d.size() > 1 )
+    {
+        bool even = d.size() % 2 == 0;
+        for( int i = 0; i < d.size(); i += 2 )
+        {
+            MerkleTreeNode * node = new MerkleTreeNode();
+            node->setLeft( d.front() );
+            d.pop_front();
+            node->setRight( d.front() );
+            d.pop_front();
+            d.push_back( node );
+        }
+
+        if( !even )
+        {
+            MerkleTreeNode * node = new MerkleTreeNode();
+            node->setLeft( d.front() );
+            d.pop_front();
+            d.push_back( node );
+        }
+    }
+
+    this->root = d.front();
+    d.clear();
 
     return true;
 }
