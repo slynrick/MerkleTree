@@ -17,11 +17,12 @@ using namespace std::chrono;
 
 vector<string> creatingData( int len )
 {
+    srand( time( NULL ) );
     vector<string> data;
     stringstream ss;
     for( int i = 0; i < len; ++i )
     {
-        ss << (int)pow( 10, len ) + i;
+        ss << (int)pow( 10, rand() % len ) + i;
         string test = ss.str();
         data.push_back( test );
     }
@@ -111,7 +112,7 @@ int main( int argv, char** argc )
     MerkleTree * baseTree = new MerkleTree();
     creatingMerkleTree( baseTree, 1000 );
 
-    for( int i = 0; i <= 4000; i += 100 )
+    for( int i = 0; i <= 4000; i += 50 )
     {
         cout << "Testing Merkle Tree with " << i << " leaves" << endl;
         MerkleTree * tree = new MerkleTree();
