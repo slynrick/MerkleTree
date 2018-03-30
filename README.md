@@ -32,7 +32,7 @@ Casos | Melhor caso ideal | Pior caso ideal | Melhor caso real | Pior caso real 
 **Syncronização** | Log2(N) | N | Log2(N) | N |
 **Criação da árvore** | N | N | N | N |
 **Validação da árvore** | N | N | N | N |
-**Validação do nó** | Log2(N) | Log2(N) | Log2(N) | Log2(N) |
+**Validação do nó** | N | N | N | N |
 **Espaço** | N | N | N | N |
 
 ### Licença
